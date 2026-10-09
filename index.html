@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sheven Studio | Studio software untuk aplikasi skala besar</title>
+  <meta name="description" content="Sheven Studio membantu pemilik bisnis membangun aplikasi besar secara bertahap. Produk kami: TitipGracia, Gudangku, dan RestoPOS.">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Sheven Studio">
+  <meta property="og:description" content="Studio software untuk aplikasi skala besar. Dibangun bertahap, dirilis satu per satu.">
+  <meta property="og:locale" content="id_ID">
+  <link rel="icon" href="assets/svg/favicon.svg" type="image/svg+xml">
+
+  <!--
+    Tipografi: Plus Jakarta Sans untuk teks (dirancang untuk pasar Indonesia, terbaca di ukuran kecil),
+    Instrument Serif italic hanya untuk kata penekanan di judul agar terasa editorial dan mewah.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            display: ['"Instrument Serif"', 'Georgia', 'serif']
+          },
+          colors: { ink: '#0a0a0a', mist: '#f4f4f1', line: '#e4e4df', mute: '#5e5e5a', gold: '#d4b06a', 'gold-ink': '#7a5c1c' }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/styles.css">
+
+  <script src="js/i18n.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+</head>
+
+<body class="font-sans grain" x-data="site" x-cloak>
+  <a href="#produk" class="skip-link" x-text="t('nav.products')">Produk</a>
+  <div id="ring" class="ring" aria-hidden="true"></div>
+
+  <!-- NAVBAR -->
+  <header class="fixed inset-x-0 top-0 z-50 px-4 pt-3 sm:px-6">
+    <nav class="nav-shell mx-auto flex max-w-6xl items-center justify-between rounded-full px-4 py-2 sm:px-6" :class="scrolled && 'scrolled'" aria-label="Utama">
+      <a href="#beranda" class="flex min-h-[44px] items-center gap-2.5 font-bold tracking-tight" aria-label="Sheven Studio">
+        <!-- Tanda logo sementara (placeholder), ganti dengan logo asli -->
+        <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#0a0a0a"/><path d="M21 10.5C21 8 18.8 6.5 16 6.5S11 8 11 10.5 13 14 16 15s5 2.5 5 5.5-2.2 5-5 5-5-1.5-5-4" fill="none" stroke="#d4b06a" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <span>Sheven Studio</span>
+      </a>
+
+      <div class="hidden items-center gap-8 md:flex">
+        <a href="#beranda" class="nav-link" :class="active==='beranda' && 'active'" x-text="t('nav.home')"></a>
+        <a href="#produk" class="nav-link" :class="active==='produk' && 'active'" x-text="t('nav.products')"></a>
+        <a href="#layanan" class="nav-link" :class="active==='layanan' && 'active'" x-text="t('nav.services')"></a>
+        <a href="#tentang" class="nav-link" :class="active==='tentang' && 'active'" x-text="t('nav.about')"></a>
+        <a href="#kontak" class="nav-link" :class="active==='kontak' && 'active'" x-text="t('nav.contact')"></a>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button type="button" @click="toggleLang()" class="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-3 text-sm font-semibold" :aria-label="t('nav.lang')">
+          <span :class="lang==='id' ? 'text-ink' : 'text-mute'">ID</span><span class="mx-1 text-mute">/</span><span :class="lang==='en' ? 'text-ink' : 'text-mute'">EN</span>
+        </button>
+        <a href="#kontak" class="btn btn-dark magnetic hidden !min-h-[44px] !px-5 sm:inline-flex" x-text="t('nav.cta')"></a>
+        <button type="button" class="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-line md:hidden" @click="menu = true" :aria-label="t('nav.menu')" aria-haspopup="dialog" :aria-expanded="menu">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M2 5h14M2 13h14"/></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Menu mobile -->
+  <div x-show="menu" x-transition.opacity x-cloak class="fixed inset-0 z-[60] flex flex-col bg-ink px-6 pb-10 pt-4 text-white md:hidden on-dark" role="dialog" aria-modal="true" :aria-label="t('nav.menu')" @keydown.escape.window="menu=false">
+    <div class="flex items-center justify-between">
+      <span class="font-bold">Sheven Studio</span>
+      <button type="button" class="flex h-[44px] w-[44px] items-center justify-center rounded-full border border-white/30" @click="menu=false" :aria-label="t('nav.close')">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+      </button>
+    </div>
+    <div class="mt-12 flex flex-col gap-1 font-display text-5xl">
+      <a href="#beranda" @click="menu=false" class="py-2" x-text="t('nav.home')"></a>
+      <a href="#produk" @click="menu=false" class="py-2" x-text="t('nav.products')"></a>
+      <a href="#layanan" @click="menu=false" class="py-2" x-text="t('nav.services')"></a>
+      <a href="#tentang" @click="menu=false" class="py-2" x-text="t('nav.about')"></a>
+      <a href="#kontak" @click="menu=false" class="py-2" x-text="t('nav.contact')"></a>
+    </div>
+    <a href="#kontak" @click="menu=false" class="btn btn-light mt-auto" x-text="t('nav.cta')"></a>
+  </div>
+
+  <main id="main">
+    <!-- HERO -->
+    <section id="beranda" class="relative overflow-hidden px-4 pb-24 pt-32 sm:px-6 md:pt-40">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <!-- Motif identitas: lingkaran konsentris, melambangkan aplikasi besar yang dibangun lapis demi lapis -->
+      <svg class="arcs" viewBox="0 0 1400 1400" aria-hidden="true">
+        <circle cx="700" cy="700" r="300" pathLength="1"/>
+        <circle cx="700" cy="700" r="430" pathLength="1"/>
+        <circle cx="700" cy="700" r="560" pathLength="1"/>
+        <circle cx="700" cy="700" r="690" pathLength="1"/>
+      </svg>
+
+      <div class="relative mx-auto max-w-5xl text-center">
+        <h1 class="text-[clamp(2.9rem,9vw,7rem)] font-semibold leading-[.98] tracking-tight">
+          <span class="block text-[#85857f]">
+            <template x-for="(w, i) in words('hero.l1')" :key="lang + 'a' + i"><span class="word"><span :style="'--i:' + i" x-text="w"></span></span></template>
+          </span>
+          <span class="block font-display font-normal italic">
+            <template x-for="(w, i) in words('hero.l2')" :key="lang + 'b' + i"><span class="word"><span :style="'--i:' + (i + 3)" x-text="w"></span></span></template>
+          </span>
+        </h1>
+        <p class="fade-in mx-auto mt-8 max-w-2xl text-base leading-relaxed text-mute sm:text-lg" style="--d:900ms" x-text="t('hero.sub')"></p>
+        <div class="fade-in mt-10 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center" style="--d:1100ms">
+          <a href="#kontak" class="btn btn-dark magnetic" x-text="t('hero.cta1')"></a>
+          <a href="#produk" class="btn btn-ghost magnetic" x-text="t('hero.cta2')"></a>
+        </div>
+      </div>
+
+      <!-- Mockup laptop: Gudangku -->
+      <figure class="laptop-wrap relative mx-auto mt-16 max-w-3xl md:mt-20">
+        <div class="laptop-rise">
+          <div class="laptop">
+            <div class="laptop-screen">
+              <div class="demo-stage" @pointerenter="demoHover = true" @pointerleave="demoHover = false">
+                <div class="demo-screen" :class="demo === 0 ? 'is-on' : (demoPrev === 0 ? 'is-out' : '')">
+                <div class="fit" data-w="1280" style="--w:1280;--h:800;--ar:1280/800" aria-hidden="true">
+                <div class="fit-in shot flex" style="--acc-bg:#dbe4ef;--acc-ink:#1f3a5f">
+                  <aside class="w-[230px] shrink-0 border-r border-[#e5e7eb] bg-white p-4">
+                    <div class="mb-6 flex items-center gap-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4b6a91] text-white"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="6" y="2" width="4" height="4" rx="1"/><rect x="2" y="9" width="4" height="4" rx="1"/><rect x="10" y="9" width="4" height="4" rx="1"/></svg></span><div><b class="block text-[15px]">Gudangku</b><span class="text-[10px] tracking-wider text-[#6b7280]">WAREHOUSE · FLEET</span></div></div>
+                    <p class="nav-h">RINGKASAN</p><p class="nav-i on">Dashboard</p><p class="nav-i">Peringatan Stok</p>
+                    <p class="nav-h mt-3">INVENTARIS</p>
+                    <template x-for="m in ['Stok','Cari Seri','Recall','Penerimaan','Tugas Gudang','Tugas Saya','Pindah Lokasi','Histori Mutasi','Stok Opname','Retur & Karantina','Pemusnahan']" :key="m"><p class="nav-i" x-text="m"></p></template>
+                  </aside>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex h-[66px] items-center justify-between border-b border-[#e5e7eb] bg-white px-6">
+                      <div class="flex h-[38px] w-[300px] items-center justify-between rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-3 text-[#6b7280]"><span>Cari menu &amp; aksi...</span><span class="rounded border border-[#e5e7eb] px-1.5 text-[10px]">Ctrl K</span></div>
+                      <div class="flex items-center gap-4 text-[#6b7280]"><span>ID</span><span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#e5e7eb] text-xs font-semibold text-[#374151]">A</span><div class="leading-tight"><b class="block text-[13px] text-[#111827]">Admin</b><span class="text-[11px]">Super Admin</span></div></div>
+                    </div>
+                    <div class="p-6">
+                      <div class="flex items-start justify-between"><div><p class="text-[26px] font-bold leading-tight text-[#111827]">Selamat siang</p><p class="text-[#4b5563]">Ringkasan kondisi gudang dan pengiriman hari ini</p></div><div class="flex items-center gap-3"><span class="rounded-lg border border-[#e5e7eb] bg-white px-4 py-2">Semua gudang</span><span class="rounded-lg bg-[#4b6a91] px-4 py-2 font-semibold text-white">+ Buat DO</span></div></div>
+                      <div class="mt-5 grid grid-cols-4 gap-4">
+                        <template x-for="k in [['SKU tersedia','34','Nilai stok: contoh','#dbe4ef'],['Stok menipis','4','Hampir kadaluarsa: 0','#f6ecd9'],['Truk di jalan','2','Truk siap: 7','#d9e8e8'],['Order menunggu kirim','11','Dipesan: contoh','#e7e3f3']]" :key="k[0]"><div class="card flex items-center gap-3 p-4"><span class="h-12 w-12 shrink-0 rounded-xl" :style="'background:' + k[3]"></span><div><p class="text-[12px] font-semibold text-[#374151]" x-text="k[0]"></p><p class="text-[26px] font-bold leading-none text-[#111827]" x-text="k[1]"></p><p class="mt-1 text-[11px] text-[#6b7280]" x-text="k[2]"></p></div></div></template>
+                      </div>
+                      <div class="mt-4 grid grid-cols-[1.9fr_1fr] gap-4">
+                        <div class="card p-5"><div class="flex justify-between"><div><b class="text-[16px] text-[#111827]">Pergerakan stok</b><p class="text-[12px] text-[#6b7280]">30 hari terakhir (satuan dasar)</p></div><span class="text-[12px] text-[#6b7280]">Lihat semua</span></div>
+                          <div class="mt-4 flex h-[190px] items-end justify-between border-b border-[#e5e7eb] px-2">
+                            <template x-for="(b, i) in [[8,12,6],[0,14,0],[0,10,0],[120,10,70],[2,10,0],[36,14,26],[0,4,0],[0,12,0],[6,8,4],[4,6,8],[0,8,0],[60,10,40],[0,8,0],[0,6,0],[80,14,66],[0,6,0]]" :key="i"><div class="flex w-[16px] flex-col justify-end"><i class="block bg-[#b8924a]" :style="'height:' + b[2] + 'px'"></i><i class="block bg-[#4f6f95]" :style="'height:' + b[1] + 'px'"></i><i class="block bg-[#5f8f78]" :style="'height:' + b[0] + 'px'"></i></div></template>
+                          </div>
+                          <div class="mt-3 flex gap-5 text-[12px] text-[#4b5563]"><span><i class="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-[#5f8f78]"></i>Masuk</span><span><i class="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-[#4f6f95]"></i>Keluar</span><span><i class="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-[#b8924a]"></i>Dipindah</span></div>
+                        </div>
+                        <div class="card p-5"><b class="text-[16px] text-[#111827]">Tugas hari ini</b>
+                          <template x-for="r in [['Putaway menunggu','23'],['Opname berjalan','0'],['DO sedang dimuat','0'],['DO siap dimuat','0']]" :key="r[0]"><div class="mt-3 flex items-center justify-between rounded-lg border border-[#e5e7eb] px-3 py-3"><span class="flex items-center gap-3"><i class="h-4 w-4 rounded bg-[#4f6f95]"></i><span x-text="r[0]"></span></span><b class="rounded bg-[#f3f4f6] px-2 py-0.5" x-text="r[1]"></b></div></template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                </div>
+                <div class="demo-screen" :class="demo === 1 ? 'is-on' : (demoPrev === 1 ? 'is-out' : '')">
+                <div class="fit" data-w="1100" style="--w:1100;--h:688;--ar:1100/688" aria-hidden="true">
+              <div class="fit-in shot" style="background:#f3f4f6">
+                <div class="flex h-[64px] items-center justify-between border-b border-[#e5e7eb] bg-white px-[120px]">
+                  <b class="text-[26px] italic text-[#0a8f2a]">Titip<span class="text-[#111827]">Gracia</span></b>
+                  <div class="h-[38px] w-[420px] rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-4 pt-[8px] text-[#9ca3af]">Search products...</div>
+                  <div class="flex items-center gap-4"><span>Trips</span><span class="rounded-md border border-[#e5e7eb] text-[12px] font-bold"><i class="inline-block rounded-md bg-[#0a8f2a] px-2 py-1 not-italic text-white">EN</i><i class="inline-block px-2 py-1 not-italic">ID</i></span><span class="rounded-lg border border-[#0a8f2a] px-4 py-2 font-semibold text-[#0a8f2a]">Sign in</span><span class="rounded-lg bg-[#0a8f2a] px-4 py-2 font-semibold text-white">Sign up</span></div>
+                </div>
+                <div class="mx-[120px] mt-[26px] overflow-hidden rounded-2xl p-[44px]" style="background:linear-gradient(100deg,#08902a,#12b676)">
+                  <span class="rounded-full bg-white/20 px-3 py-1 text-[12px] font-semibold text-white">Trusted Personal Shopping</span>
+                  <p class="mt-4 max-w-[560px] text-[32px] font-bold leading-[1.2] text-white">Dream items from other cities &amp; countries, bought for you.</p>
+                  <p class="mt-3 text-white/90">Just pay a 50% deposit. The rest is due once the shipping cost is final.</p>
+                </div>
+                <div class="mx-[120px] mt-[26px] rounded-2xl bg-white p-6"><b class="text-[17px] text-[#111827]">From your cart to your door</b>
+                  <div class="mt-5 grid grid-cols-4 gap-4 text-center">
+                    <template x-for="(st, i) in [['Choose products','Add to cart &amp; check out'],['Pay a 50% deposit','Virtual account, QRIS, e-wallet, and more'],['We buy it for you','Admin confirms the shipping cost'],['Pay the rest &amp; receive','Items are shipped to your address']]" :key="i"><div><span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#0a8f2a] text-[#0a8f2a]" x-text="i + 1"></span><p class="mt-2 text-[12px] font-semibold text-[#0a8f2a]" x-text="'Step ' + (i + 1)"></p><p class="font-semibold text-[#111827]" x-html="st[0]"></p><p class="text-[12px] text-[#6b7280]" x-html="st[1]"></p></div></template>
+                  </div>
+                </div>
+                <div class="mx-[120px] mt-[26px] grid grid-cols-[220px_1fr] gap-5"><div class="h-[180px] rounded-xl bg-white p-4"><b class="text-[#111827]">Filter</b><p class="mt-3 text-[11px] text-[#6b7280]">CATEGORY</p><p class="mt-2 rounded-lg bg-[#dcf5e3] px-3 py-2 font-semibold text-[#0a8f2a]">All Categories</p></div><div class="pt-1"><b class="text-[20px] text-[#111827]">Available Products</b><p class="text-[12px] text-[#6b7280]">Items shipped from other cities &amp; countries</p></div></div>
+              </div>
+            </div>
+                </div>
+                <div class="demo-screen" :class="demo === 2 ? 'is-on' : (demoPrev === 2 ? 'is-out' : '')">
+                <div class="fit" data-w="1100" style="--w:1100;--h:688;--ar:1100/688" aria-hidden="true">
+              <div class="fit-in shot flex" style="background:#fafafa;--acc-bg:#fde6e1;--acc-ink:#d63f26">
+                <aside class="w-[210px] shrink-0 border-r border-[#e5e7eb] bg-white p-3">
+                  <div class="mb-5 flex items-center gap-3 px-1"><span class="h-10 w-10 rounded-xl bg-[#7a3b2a]"></span><div class="leading-tight"><b class="block text-[14px]">Nama Restoran</b><span class="text-[11px] text-[#6b7280]">Owner / Admin</span></div></div>
+                  <p class="nav-h">RINGKASAN</p><p class="nav-i on">Dashboard</p><p class="nav-i">Pesanan</p><p class="nav-i">Laporan</p>
+                  <p class="nav-h mt-3">OPERASIONAL</p><p class="nav-i">Kasir</p><p class="nav-i">Sesi Meja</p><p class="nav-i">Dapur</p>
+                  <p class="nav-h mt-3">MENU</p><p class="nav-i">Produk</p><p class="nav-i">Kategori</p><p class="nav-i">Varian</p><p class="nav-i">Promo &amp; Voucher</p>
+                  <p class="nav-h mt-3">RESTORAN</p><p class="nav-i">Outlet</p><p class="nav-i">Meja &amp; QR</p><p class="nav-i">Staf</p>
+                </aside>
+                <div class="min-w-0 flex-1">
+                  <div class="flex h-[60px] items-center justify-between border-b border-[#e5e7eb] bg-white px-6"><span class="font-semibold text-[#111827]">Outlet Utama</span><span class="rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-[12px] font-semibold">Lihat Menu</span></div>
+                  <div class="p-6">
+                    <div class="flex items-start justify-between"><div><p class="text-[28px] font-bold leading-tight text-[#111827]">Dashboard</p><p class="text-[#6b7280]">Pantau pemasukan, order, dan performa restoran.</p></div><div class="flex gap-2"><span class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2">Semua outlet</span><span class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2">7 hari terakhir</span></div></div>
+                    <div class="mt-4 flex gap-2 text-[12px] font-semibold"><span class="rounded-full bg-[#fdebd3] px-3 py-1.5 text-[#9a4a12]">Menunggu Pembayaran: 0</span><span class="rounded-full bg-[#dbeafe] px-3 py-1.5 text-[#1d4ed8]">Lunas, Antri: 1</span><span class="rounded-full bg-[#fde8d8] px-3 py-1.5 text-[#c2410c]">Sedang Dimasak: 0</span><span class="rounded-full bg-[#d6f5e6] px-3 py-1.5 text-[#15803d]">Siap Diambil: 0</span></div>
+                    <div class="mt-4 grid grid-cols-4 gap-4">
+                      <template x-for="k in [['PENDAPATAN','Rp0','contoh'],['JUMLAH ORDER','1',''],['RATA-RATA / ORDER','Rp0','Diskon Rp0'],['FEE PLATFORM','Rp0','0 order batal']]" :key="k[0]"><div class="card p-4"><p class="text-[11px] text-[#6b7280]" x-text="k[0]"></p><p class="mt-1 text-[24px] font-bold text-[#111827]" x-text="k[1]"></p><p class="mt-1 h-4 text-[11px] text-[#6b7280]" x-text="k[2]"></p></div></template>
+                    </div>
+                    <div class="mt-4 grid grid-cols-[2.1fr_1fr] gap-4">
+                      <div class="card p-5"><b class="text-[16px] text-[#111827]">Pendapatan &amp; order harian</b>
+                        <svg viewBox="0 0 560 190" class="mt-3 w-full" aria-hidden="true"><g stroke="#e5e7eb"><path d="M0 20H560M0 60H560M0 100H560M0 140H560M0 180H560"/></g><rect x="110" y="30" width="46" height="150" rx="4" fill="#f0553a"/><path d="M60 180C90 180 100 40 133 40S175 180 220 180H540" fill="none" stroke="#f5b819" stroke-width="3"/></svg>
+                      </div>
+                      <div class="card p-5"><b class="text-[16px] text-[#111827]">Menu terlaris</b><div class="mt-3 flex justify-between text-[13px]"><span>Menu contoh</span><span class="text-[#6b7280]">1 porsi</span></div><div class="mt-2 h-1.5 rounded bg-[#f0553a]"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+                </div>
+                <!-- kursor simulasi -->
+                <div class="demo-cursor" :class="[cur.show && 'show', cur.instant && 'instant', cur.click && 'click']" :style="'left:' + cur.x + '%; top:' + cur.y + '%'" aria-hidden="true">
+                  <span class="demo-ripple"></span>
+                  <svg width="22" height="26" viewBox="0 0 22 26"><path d="M2 2l16 12-7 1.5L8 23z" fill="#fff" stroke="#0a0a0a" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+            </div>
+            <div class="laptop-base" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="mt-8 flex flex-col items-center gap-4">
+          <div class="flex flex-wrap items-center justify-center gap-2" role="group" :aria-label="t('hero.pick')">
+            <template x-for="(d, i) in t('hero.demo')" :key="lang + i">
+              <button type="button" class="demo-pill" :class="demo === i && 'on'" :aria-pressed="demo === i" @click="demoGo(i)" x-text="d.name"></button>
+            </template>
+            <button type="button" class="demo-pill demo-toggle" @click="demoToggle()" :aria-label="playing ? t('hero.pause') : t('hero.play')" :title="playing ? t('hero.pause') : t('hero.play')">
+              <svg x-show="playing" width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><rect x="2.5" y="2" width="3" height="10" rx="1"/><rect x="8.5" y="2" width="3" height="10" rx="1"/></svg>
+              <svg x-show="!playing" x-cloak width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true"><path d="M3.5 2l8 5-8 5z"/></svg>
+            </button>
+          </div>
+          <p class="text-center text-sm text-mute" aria-live="off"><b class="text-ink" x-text="t('hero.demo')[demo].name"></b> <span x-text="'· ' + t('hero.demo')[demo].note + ' · ' + t('mock.caption')"></span></p>
+        </div>
+      </figure>
+    </section>
+
+    <!-- MARQUEE -->
+    <section class="overflow-hidden border-y border-line bg-white py-6" aria-label="Produk dan modul">
+      <div class="marquee">
+        <template x-for="n in 2" :key="'m'+n">
+          <div class="flex shrink-0 items-center" :aria-hidden="n === 2">
+            <template x-for="item in t('marquee')" :key="n + item">
+              <div class="flex items-center">
+                <span class="px-8 font-display text-4xl italic text-ink sm:text-5xl" x-text="item"></span>
+                <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="10" fill="none" stroke="#d4b06a" stroke-width="1.2"/><circle cx="13" cy="13" r="4" fill="#d4b06a"/></svg>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- PRODUK -->
+    <section id="produk" class="bg-white px-4 py-24 sm:px-6 md:py-36">
+      <div class="mx-auto max-w-6xl">
+        <div class="reveal max-w-3xl">
+          <h2 class="text-4xl font-semibold leading-tight tracking-tight sm:text-6xl" x-text="t('products.title')"></h2>
+          <p class="mt-5 text-lg text-mute" x-text="t('products.intro')"></p>
+        </div>
+
+        <div class="mt-14">
+          <!-- PETA MODUL (desktop) -->
+          <div class="reveal relative mx-auto hidden w-full max-w-[780px] md:block" role="group" :aria-label="t('products.mapHint')">
+            <svg class="pointer-events-none absolute inset-0 z-0 h-full w-full" viewBox="0 0 700 520" aria-hidden="true">
+              <!-- jalur ke modul yang sudah berjalan: aliran emas bergerak -->
+              <path class="flow-base" d="M350 156V260M250 260H350M450 260H350"/>
+              <path class="flow" d="M350 156V260M250 260H350M450 260H350"/>
+              <!-- jalur ke modul yang direncanakan: putus-putus, statis -->
+              <path class="flow-plan" d="M150 364H350V260M550 364H350V260M550 156H350V260"/>
+            </svg>
+            <div class="map-grid relative z-10 grid grid-cols-7">
+              <template x-for="i in 35" :key="i">
+                <div class="map-cell">
+                  <template x-if="cellKey(i - 1) === 'hub'">
+                    <div class="flex flex-col items-center"><span class="hub" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 32 32"><path d="M21 10.5C21 8 18.8 6.5 16 6.5S11 8 11 10.5 13 14 16 15s5 2.5 5 5.5-2.2 5-5 5-5-1.5-5-4" fill="none" stroke="#d4b06a" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="map-label font-semibold text-ink">Sheven</span></div>
+                  </template>
+                  <template x-if="cellKey(i - 1) === 'ghost'">
+                    <div class="flex flex-col items-center" aria-hidden="true"><span class="map-tile ghost"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></span><span class="map-label" x-text="t('products.more')"></span></div>
+                  </template>
+                  <template x-if="prods[cellKey(i - 1)]">
+                    <button type="button" class="flex flex-col items-center" @click="selectProd(cellKey(i - 1))" :aria-pressed="prod === cellKey(i - 1)">
+                      <span class="map-tile" :class="[prod === cellKey(i - 1) && 'on', 'st-' + prods[cellKey(i - 1)].s]" :style="'color:' + prods[cellKey(i - 1)].color"><i class="map-dot" :class="'d-' + prods[cellKey(i - 1)].s" aria-hidden="true"></i><span x-html="icon(cellKey(i - 1))" class="flex justify-center"></span></span>
+                      <span class="map-label" :class="prod === cellKey(i - 1) && 'font-semibold text-ink'" x-text="prods[cellKey(i - 1)].short || prods[cellKey(i - 1)].name"></span>
+                    </button>
+                  </template>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- DAFTAR MODUL (mobile) -->
+          <div class="md:hidden">
+            <div class="mb-5 flex items-center gap-3"><span class="hub !h-12 !w-12" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 32 32"><path d="M21 10.5C21 8 18.8 6.5 16 6.5S11 8 11 10.5 13 14 16 15s5 2.5 5 5.5-2.2 5-5 5-5-1.5-5-4" fill="none" stroke="#d4b06a" stroke-width="2.4" stroke-linecap="round"/></svg></span><p class="text-sm text-mute" x-text="t('products.mapHint')"></p></div>
+            <div class="grid grid-cols-2 gap-3">
+              <template x-for="k in Object.keys(prods)" :key="k">
+                <button type="button" class="flex min-h-[64px] items-center gap-3 rounded-2xl border bg-white p-3 text-left transition" :class="prod === k ? 'border-ink shadow-md' : 'border-line'" @click="selectProd(k)" :aria-pressed="prod === k">
+                  <span class="map-tile !h-11 !w-11 shrink-0" :class="'st-' + prods[k].s" :style="'color:' + prods[k].color" x-html="icon(k)"></span>
+                  <span class="min-w-0"><b class="block text-sm leading-tight" x-text="prods[k].short || prods[k].name"></b><span class="text-xs text-mute" x-text="status_label(prods[k].s)"></span></span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <!-- legenda -->
+          <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <span class="status status-live" x-text="t('products.live')"></span>
+            <span class="status status-beta" x-text="t('products.beta')"></span>
+            <span class="status status-soon" x-text="t('products.planned')"></span>
+          </div>
+
+          <!-- PANEL DETAIL -->
+          <div class="mt-10 overflow-hidden rounded-3xl border border-line bg-mist p-6 sm:p-8 md:p-10" aria-live="polite">
+            <div class="grid items-center gap-8 md:grid-cols-[0.85fr_1.25fr] md:gap-12">
+              <div>
+                <span class="status" :class="'status-' + (prods[prod].s === 'planned' ? 'soon' : prods[prod].s)" x-text="status_label(prods[prod].s)"></span>
+                <h3 class="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl" x-text="pTitle()"></h3>
+                <p class="mt-1 text-sm text-mute" x-text="pTag()"></p>
+                <p class="mt-5 text-mute" x-text="pDesc()"></p>
+                <div class="mt-8">
+                  <a x-show="prod === 'titipgracia'" :href="productHref('graciatitip')" :target="productExternal('graciatitip') ? '_blank' : null" :rel="productExternal('graciatitip') ? 'noopener' : null" class="btn btn-dark magnetic" x-text="t('products.graciatitip.cta')"></a>
+                  <a x-show="prod === 'gudangku'" x-cloak href="#kontak" @click="pick('beta')" class="btn btn-dark magnetic" x-text="t('products.warehouse.cta')"></a>
+                  <a x-show="prod === 'restopos'" x-cloak href="#kontak" @click="pick('resto')" class="btn btn-dark magnetic" x-text="t('products.resto.cta')"></a>
+                  <a x-show="prods[prod].s === 'planned'" x-cloak href="#kontak" @click="pick('other')" class="btn btn-ghost magnetic" x-text="t('products.notify')"></a>
+                </div>
+              </div>
+              <div>
+                <div x-show="prod === 'titipgracia'" x-transition.opacity.duration.400ms>
+                  <div class="fit rounded-xl border border-line" data-w="1100" style="--w:1100;--h:688;--ar:1100/688" role="img" :aria-label="t('mock.caption') + ': TitipGracia'">
+              <div class="fit-in shot" style="background:#f3f4f6">
+                <div class="flex h-[64px] items-center justify-between border-b border-[#e5e7eb] bg-white px-[120px]">
+                  <b class="text-[26px] italic text-[#0a8f2a]">Titip<span class="text-[#111827]">Gracia</span></b>
+                  <div class="h-[38px] w-[420px] rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-4 pt-[8px] text-[#9ca3af]">Search products...</div>
+                  <div class="flex items-center gap-4"><span>Trips</span><span class="rounded-md border border-[#e5e7eb] text-[12px] font-bold"><i class="inline-block rounded-md bg-[#0a8f2a] px-2 py-1 not-italic text-white">EN</i><i class="inline-block px-2 py-1 not-italic">ID</i></span><span class="rounded-lg border border-[#0a8f2a] px-4 py-2 font-semibold text-[#0a8f2a]">Sign in</span><span class="rounded-lg bg-[#0a8f2a] px-4 py-2 font-semibold text-white">Sign up</span></div>
+                </div>
+                <div class="mx-[120px] mt-[26px] overflow-hidden rounded-2xl p-[44px]" style="background:linear-gradient(100deg,#08902a,#12b676)">
+                  <span class="rounded-full bg-white/20 px-3 py-1 text-[12px] font-semibold text-white">Trusted Personal Shopping</span>
+                  <p class="mt-4 max-w-[560px] text-[32px] font-bold leading-[1.2] text-white">Dream items from other cities &amp; countries, bought for you.</p>
+                  <p class="mt-3 text-white/90">Just pay a 50% deposit. The rest is due once the shipping cost is final.</p>
+                </div>
+                <div class="mx-[120px] mt-[26px] rounded-2xl bg-white p-6"><b class="text-[17px] text-[#111827]">From your cart to your door</b>
+                  <div class="mt-5 grid grid-cols-4 gap-4 text-center">
+                    <template x-for="(st, i) in [['Choose products','Add to cart &amp; check out'],['Pay a 50% deposit','Virtual account, QRIS, e-wallet, and more'],['We buy it for you','Admin confirms the shipping cost'],['Pay the rest &amp; receive','Items are shipped to your address']]" :key="i"><div><span class="mx-auto flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#0a8f2a] text-[#0a8f2a]" x-text="i + 1"></span><p class="mt-2 text-[12px] font-semibold text-[#0a8f2a]" x-text="'Step ' + (i + 1)"></p><p class="font-semibold text-[#111827]" x-html="st[0]"></p><p class="text-[12px] text-[#6b7280]" x-html="st[1]"></p></div></template>
+                  </div>
+                </div>
+                <div class="mx-[120px] mt-[26px] grid grid-cols-[220px_1fr] gap-5"><div class="h-[180px] rounded-xl bg-white p-4"><b class="text-[#111827]">Filter</b><p class="mt-3 text-[11px] text-[#6b7280]">CATEGORY</p><p class="mt-2 rounded-lg bg-[#dcf5e3] px-3 py-2 font-semibold text-[#0a8f2a]">All Categories</p></div><div class="pt-1"><b class="text-[20px] text-[#111827]">Available Products</b><p class="text-[12px] text-[#6b7280]">Items shipped from other cities &amp; countries</p></div></div>
+              </div>
+            </div>
+                </div>
+                <div x-show="prod === 'gudangku'" x-cloak x-transition.opacity.duration.400ms>
+                  <div class="fit rounded-xl border border-line" data-w="1280" style="--w:1280;--h:800;--ar:1280/800" role="img" :aria-label="t('mock.caption') + ': Gudangku'">
+                <div class="fit-in shot flex" style="--acc-bg:#dbe4ef;--acc-ink:#1f3a5f">
+                  <aside class="w-[230px] shrink-0 border-r border-[#e5e7eb] bg-white p-4">
+                    <div class="mb-6 flex items-center gap-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4b6a91] text-white"><svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="6" y="2" width="4" height="4" rx="1"/><rect x="2" y="9" width="4" height="4" rx="1"/><rect x="10" y="9" width="4" height="4" rx="1"/></svg></span><div><b class="block text-[15px]">Gudangku</b><span class="text-[10px] tracking-wider text-[#6b7280]">WAREHOUSE · FLEET</span></div></div>
+                    <p class="nav-h">RINGKASAN</p><p class="nav-i on">Dashboard</p><p class="nav-i">Peringatan Stok</p>
+                    <p class="nav-h mt-3">INVENTARIS</p>
+                    <template x-for="m in ['Stok','Cari Seri','Recall','Penerimaan','Tugas Gudang','Tugas Saya','Pindah Lokasi','Histori Mutasi','Stok Opname','Retur & Karantina','Pemusnahan']" :key="m"><p class="nav-i" x-text="m"></p></template>
+                  </aside>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex h-[66px] items-center justify-between border-b border-[#e5e7eb] bg-white px-6">
+                      <div class="flex h-[38px] w-[300px] items-center justify-between rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-3 text-[#6b7280]"><span>Cari menu &amp; aksi...</span><span class="rounded border border-[#e5e7eb] px-1.5 text-[10px]">Ctrl K</span></div>
+                      <div class="flex items-center gap-4 text-[#6b7280]"><span>ID</span><span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#e5e7eb] text-xs font-semibold text-[#374151]">A</span><div class="leading-tight"><b class="block text-[13px] text-[#111827]">Admin</b><span class="text-[11px]">Super Admin</span></div></div>
+                    </div>
+                    <div class="p-6">
+                      <div class="flex items-start justify-between"><div><p class="text-[26px] font-bold leading-tight text-[#111827]">Selamat siang</p><p class="text-[#4b5563]">Ringkasan kondisi gudang dan pengiriman hari ini</p></div><div class="flex items-center gap-3"><span class="rounded-lg border border-[#e5e7eb] bg-white px-4 py-2">Semua gudang</span><span class="rounded-lg bg-[#4b6a91] px-4 py-2 font-semibold text-white">+ Buat DO</span></div></div>
+                      <div class="mt-5 grid grid-cols-4 gap-4">
+                        <template x-for="k in [['SKU tersedia','34','Nilai stok: contoh','#dbe4ef'],['Stok menipis','4','Hampir kadaluarsa: 0','#f6ecd9'],['Truk di jalan','2','Truk siap: 7','#d9e8e8'],['Order menunggu kirim','11','Dipesan: contoh','#e7e3f3']]" :key="k[0]"><div class="card flex items-center gap-3 p-4"><span class="h-12 w-12 shrink-0 rounded-xl" :style="'background:' + k[3]"></span><div><p class="text-[12px] font-semibold text-[#374151]" x-text="k[0]"></p><p class="text-[26px] font-bold leading-none text-[#111827]" x-text="k[1]"></p><p class="mt-1 text-[11px] text-[#6b7280]" x-text="k[2]"></p></div></div></template>
+                      </div>
+                      <div class="mt-4 grid grid-cols-[1.9fr_1fr] gap-4">
+                        <div class="card p-5"><div class="flex justify-between"><div><b class="text-[16px] text-[#111827]">Pergerakan stok</b><p class="text-[12px] text-[#6b7280]">30 hari terakhir (satuan dasar)</p></div><span class="text-[12px] text-[#6b7280]">Lihat semua</span></div>
+                          <div class="mt-4 flex h-[190px] items-end justify-between border-b border-[#e5e7eb] px-2">
+                            <template x-for="(b, i) in [[8,12,6],[0,14,0],[0,10,0],[120,10,70],[2,10,0],[36,14,26],[0,4,0],[0,12,0],[6,8,4],[4,6,8],[0,8,0],[60,10,40],[0,8,0],[0,6,0],[80,14,66],[0,6,0]]" :key="i"><div class="flex w-[16px] flex-col justify-end"><i class="block bg-[#b8924a]" :style="'height:' + b[2] + 'px'"></i><i class="block bg-[#4f6f95]" :style="'height:' + b[1] + 'px'"></i><i class="block bg-[#5f8f78]" :style="'height:' + b[0] + 'px'"></i></div></template>
+                          </div>
+                          <div class="mt-3 flex gap-5 text-[12px] text-[#4b5563]"><span><i class="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-[#5f8f78]"></i>Masuk</span><span><i class="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-[#4f6f95]"></i>Keluar</span><span><i class="mr-1 inline-block h-2.5 w-2.5 rounded-full bg-[#b8924a]"></i>Dipindah</span></div>
+                        </div>
+                        <div class="card p-5"><b class="text-[16px] text-[#111827]">Tugas hari ini</b>
+                          <template x-for="r in [['Putaway menunggu','23'],['Opname berjalan','0'],['DO sedang dimuat','0'],['DO siap dimuat','0']]" :key="r[0]"><div class="mt-3 flex items-center justify-between rounded-lg border border-[#e5e7eb] px-3 py-3"><span class="flex items-center gap-3"><i class="h-4 w-4 rounded bg-[#4f6f95]"></i><span x-text="r[0]"></span></span><b class="rounded bg-[#f3f4f6] px-2 py-0.5" x-text="r[1]"></b></div></template>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+                </div>
+                <div x-show="prod === 'restopos'" x-cloak x-transition.opacity.duration.400ms>
+                  <div class="fit rounded-xl border border-line" data-w="1100" style="--w:1100;--h:688;--ar:1100/688" role="img" :aria-label="t('mock.caption') + ': RestoPOS'">
+              <div class="fit-in shot flex" style="background:#fafafa;--acc-bg:#fde6e1;--acc-ink:#d63f26">
+                <aside class="w-[210px] shrink-0 border-r border-[#e5e7eb] bg-white p-3">
+                  <div class="mb-5 flex items-center gap-3 px-1"><span class="h-10 w-10 rounded-xl bg-[#7a3b2a]"></span><div class="leading-tight"><b class="block text-[14px]">Nama Restoran</b><span class="text-[11px] text-[#6b7280]">Owner / Admin</span></div></div>
+                  <p class="nav-h">RINGKASAN</p><p class="nav-i on">Dashboard</p><p class="nav-i">Pesanan</p><p class="nav-i">Laporan</p>
+                  <p class="nav-h mt-3">OPERASIONAL</p><p class="nav-i">Kasir</p><p class="nav-i">Sesi Meja</p><p class="nav-i">Dapur</p>
+                  <p class="nav-h mt-3">MENU</p><p class="nav-i">Produk</p><p class="nav-i">Kategori</p><p class="nav-i">Varian</p><p class="nav-i">Promo &amp; Voucher</p>
+                  <p class="nav-h mt-3">RESTORAN</p><p class="nav-i">Outlet</p><p class="nav-i">Meja &amp; QR</p><p class="nav-i">Staf</p>
+                </aside>
+                <div class="min-w-0 flex-1">
+                  <div class="flex h-[60px] items-center justify-between border-b border-[#e5e7eb] bg-white px-6"><span class="font-semibold text-[#111827]">Outlet Utama</span><span class="rounded-lg border border-[#e5e7eb] px-3 py-1.5 text-[12px] font-semibold">Lihat Menu</span></div>
+                  <div class="p-6">
+                    <div class="flex items-start justify-between"><div><p class="text-[28px] font-bold leading-tight text-[#111827]">Dashboard</p><p class="text-[#6b7280]">Pantau pemasukan, order, dan performa restoran.</p></div><div class="flex gap-2"><span class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2">Semua outlet</span><span class="rounded-lg border border-[#e5e7eb] bg-white px-3 py-2">7 hari terakhir</span></div></div>
+                    <div class="mt-4 flex gap-2 text-[12px] font-semibold"><span class="rounded-full bg-[#fdebd3] px-3 py-1.5 text-[#9a4a12]">Menunggu Pembayaran: 0</span><span class="rounded-full bg-[#dbeafe] px-3 py-1.5 text-[#1d4ed8]">Lunas, Antri: 1</span><span class="rounded-full bg-[#fde8d8] px-3 py-1.5 text-[#c2410c]">Sedang Dimasak: 0</span><span class="rounded-full bg-[#d6f5e6] px-3 py-1.5 text-[#15803d]">Siap Diambil: 0</span></div>
+                    <div class="mt-4 grid grid-cols-4 gap-4">
+                      <template x-for="k in [['PENDAPATAN','Rp0','contoh'],['JUMLAH ORDER','1',''],['RATA-RATA / ORDER','Rp0','Diskon Rp0'],['FEE PLATFORM','Rp0','0 order batal']]" :key="k[0]"><div class="card p-4"><p class="text-[11px] text-[#6b7280]" x-text="k[0]"></p><p class="mt-1 text-[24px] font-bold text-[#111827]" x-text="k[1]"></p><p class="mt-1 h-4 text-[11px] text-[#6b7280]" x-text="k[2]"></p></div></template>
+                    </div>
+                    <div class="mt-4 grid grid-cols-[2.1fr_1fr] gap-4">
+                      <div class="card p-5"><b class="text-[16px] text-[#111827]">Pendapatan &amp; order harian</b>
+                        <svg viewBox="0 0 560 190" class="mt-3 w-full" aria-hidden="true"><g stroke="#e5e7eb"><path d="M0 20H560M0 60H560M0 100H560M0 140H560M0 180H560"/></g><rect x="110" y="30" width="46" height="150" rx="4" fill="#f0553a"/><path d="M60 180C90 180 100 40 133 40S175 180 220 180H540" fill="none" stroke="#f5b819" stroke-width="3"/></svg>
+                      </div>
+                      <div class="card p-5"><b class="text-[16px] text-[#111827]">Menu terlaris</b><div class="mt-3 flex justify-between text-[13px]"><span>Menu contoh</span><span class="text-[#6b7280]">1 porsi</span></div><div class="mt-2 h-1.5 rounded bg-[#f0553a]"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+                </div>
+                <div x-show="prods[prod].s === 'planned'" x-cloak x-transition.opacity.duration.400ms class="flex aspect-[16/10] flex-col items-center justify-center rounded-xl border border-dashed border-[#a8a8a1] p-8 text-center">
+                  <span class="map-tile st-planned !h-16 !w-16" :style="'color:' + prods[prod].color" x-html="icon(prod)"></span>
+                  <p class="mt-5 font-display text-3xl italic" x-text="t('products.planned')"></p>
+                  <p class="mt-2 max-w-xs text-sm text-mute" x-text="t('products.notStarted')"></p>
+                </div>
+                <p class="mt-3 text-xs text-mute" x-show="prods[prod].s !== 'planned'" x-text="t('mock.caption')"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAYANAN -->
+    <section id="layanan" class="bg-mist px-4 py-24 sm:px-6 md:py-36">
+      <div class="mx-auto grid max-w-6xl gap-14 md:grid-cols-[0.9fr_1.4fr] md:gap-20">
+        <div class="reveal md:sticky md:top-32 md:self-start">
+          <h2 class="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl" x-text="t('services.title')"></h2>
+          <p class="mt-5 text-lg text-mute" x-text="t('services.intro')"></p>
+
+          <!-- Visual sticky: lapisan aplikasi yang menyala mengikuti layanan yang sedang dibaca -->
+          <div class="mt-12 hidden md:block" role="img" :aria-label="t('services.items')[svcActive].title">
+            <svg viewBox="0 0 320 320" class="w-full max-w-[340px]" aria-hidden="true">
+              <circle cx="160" cy="160" r="150" class="stage-ring" :class="svcActive === 3 && 'on'"/>
+              <circle cx="160" cy="10" r="5" class="stage-dot" :class="svcActive === 3 && 'on'"/>
+              <circle cx="160" cy="160" r="112" class="stage-ring" :class="svcActive === 2 && 'on'"/>
+              <circle cx="160" cy="48" r="5" class="stage-dot" :class="svcActive === 2 && 'on'"/>
+              <circle cx="160" cy="160" r="74" class="stage-ring" :class="svcActive === 1 && 'on'"/>
+              <circle cx="160" cy="86" r="5" class="stage-dot" :class="svcActive === 1 && 'on'"/>
+              <circle cx="160" cy="160" r="36" class="stage-ring" :class="svcActive === 0 && 'on'"/>
+              <circle cx="160" cy="124" r="5" class="stage-dot" :class="svcActive === 0 && 'on'"/>
+            </svg>
+            <p class="mt-4 flex items-baseline gap-3">
+              <span class="font-display text-4xl italic text-gold-ink" x-text="'0' + (svcActive + 1)"></span>
+              <span class="text-sm text-mute" x-text="'/ 04'"></span>
+              <span class="text-base font-semibold" x-text="t('services.items')[svcActive].title"></span>
+            </p>
+          </div>
+        </div>
+        <ol class="reveal" style="--d:100ms">
+          <template x-for="(s, i) in t('services.items')" :key="lang + s.n">
+            <li class="svc-row py-8 md:py-10" :class="i === svcActive && 'is-on'">
+              <div class="grid grid-cols-[3.5rem_1fr] gap-x-4 md:grid-cols-[5rem_1fr] md:gap-x-8">
+                <span class="svc-n font-display text-5xl italic text-ink md:text-6xl" x-text="s.n"></span>
+                <div>
+                  <h3 class="text-xl font-semibold md:text-2xl" x-text="s.title"></h3>
+                  <p class="mt-2 max-w-lg text-mute" x-text="s.desc"></p>
+                </div>
+              </div>
+            </li>
+          </template>
+        </ol>
+      </div>
+    </section>
+
+    <!-- CARA KERJA -->
+    <section class="bg-white px-4 py-24 sm:px-6 md:py-32" aria-labelledby="proses-judul">
+      <div class="mx-auto max-w-6xl">
+        <h2 id="proses-judul" class="reveal font-display text-5xl italic leading-tight sm:text-7xl" x-text="t('process.title')"></h2>
+        <ol class="mt-16 grid gap-10 sm:grid-cols-2 md:grid-cols-4 md:gap-6">
+          <template x-for="(s, i) in t('process.steps')" :key="lang + i">
+            <li class="reveal relative border-t border-ink pt-6" :class="i % 2 === 1 && 'md:mt-16'" :style="'--d:' + (i*120) + 'ms'">
+              <span class="font-display text-6xl italic text-gold-ink" x-text="i + 1"></span>
+              <h3 class="mt-3 text-xl font-semibold" x-text="s.title"></h3>
+              <p class="mt-2 text-mute" x-text="s.desc"></p>
+            </li>
+          </template>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ANGKA (fakta benar saja) -->
+    <section id="angka" class="dark-sec on-dark relative overflow-hidden px-4 py-24 sm:px-6 md:py-36">
+      <svg class="pointer-events-none absolute -right-40 -top-40 w-[760px] opacity-70" viewBox="0 0 800 800" aria-hidden="true">
+        <circle cx="400" cy="400" r="200" fill="none" stroke="#fff" stroke-opacity=".08"/>
+        <circle cx="400" cy="400" r="300" fill="none" stroke="#fff" stroke-opacity=".08"/>
+        <circle cx="400" cy="400" r="390" fill="none" stroke="#d4b06a" stroke-opacity=".35"/>
+      </svg>
+      <div class="relative mx-auto max-w-6xl">
+        <div class="reveal max-w-3xl">
+          <h2 class="font-display text-5xl italic leading-tight sm:text-7xl" x-text="t('stats.title')"></h2>
+          <p class="mt-6 max-w-xl text-lg text-[#c9c9c4]" x-text="t('stats.intro')"></p>
+        </div>
+        <dl class="mt-16 grid grid-cols-2 gap-x-6 gap-y-14 md:grid-cols-4">
+          <template x-for="(s, i) in stats()" :key="s.key">
+            <div class="reveal border-t border-white/25 pt-6" :style="'--d:' + (i*110) + 'ms'">
+              <dd class="stat-num font-display text-[clamp(3.4rem,10vw,7.5rem)] leading-none" x-text="vals[i]"></dd>
+              <dt class="mt-4 text-sm text-[#c9c9c4] sm:text-base" x-text="statLabel(s.key)"></dt>
+            </div>
+          </template>
+        </dl>
+      </div>
+    </section>
+
+    <!-- TENTANG -->
+    <section id="tentang" class="bg-white px-4 py-24 sm:px-6 md:py-36">
+      <div class="mx-auto grid max-w-6xl gap-16 md:grid-cols-2 md:gap-20">
+        <div>
+          <div class="reveal">
+            <h2 class="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl" x-text="t('about.title')"></h2>
+            <p class="mt-5 max-w-md text-lg text-mute" x-text="t('about.intro')"></p>
+          </div>
+          <div class="mt-12 grid grid-cols-2 gap-4 sm:gap-6">
+            <template x-for="(f, i) in t('about.founders')" :key="lang + i">
+              <figure class="reveal" :class="i === 1 && 'mt-10'" :style="'--d:' + (i*140) + 'ms'">
+                <div class="overflow-hidden rounded-2xl bg-ink">
+                  <img :src="f.img" :alt="f.name + ' (' + t('about.placeholder') + ')'" width="400" height="500" class="aspect-[4/5] w-full object-cover transition duration-700 hover:scale-105 bg-white" loading="lazy">
+                </div>
+                <figcaption class="mt-4">
+                  <b class="block" x-text="f.name"></b>
+                  <span class="text-sm text-mute" x-text="f.role"></span>
+                </figcaption>
+              </figure>
+            </template>
+          </div>
+        </div>
+
+        <div class="md:pt-6">
+          <h3 class="reveal font-display text-4xl italic" x-text="t('about.timelineTitle')"></h3>
+          <ol id="timeline" class="relative mt-10 pl-10">
+            <svg class="absolute left-[11px] top-2 h-[calc(100%-1rem)] w-[3px]" viewBox="0 0 3 100" preserveAspectRatio="none" aria-hidden="true">
+              <line x1="1.5" y1="0" x2="1.5" y2="100" stroke="#e4e4df" stroke-width="1" vector-effect="non-scaling-stroke"/>
+              <line class="tl-path" x1="1.5" y1="0" x2="1.5" y2="100" pathLength="1" stroke="#7a5c1c" stroke-width="2" vector-effect="non-scaling-stroke" :style="'--p:' + tlProgress"/>
+            </svg>
+            <template x-for="(it, i) in t('about.timeline')" :key="lang + i">
+              <li class="tl-item relative pb-12 last:pb-0" :class="i <= tlActive && 'on'">
+                <span class="tl-dot absolute -left-10 top-1.5 h-[23px] w-[23px] rounded-full border-2 border-[#b9b9b2] bg-white"></span>
+                <p class="text-sm font-semibold text-gold-ink" x-text="it.when"></p>
+                <h4 class="mt-1 text-xl font-semibold" x-text="it.title"></h4>
+                <p class="mt-2 max-w-md text-mute" x-text="it.desc"></p>
+              </li>
+            </template>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONI (hanya testimoni asli; kosong = ajakan pengguna pertama) -->
+    <section class="bg-mist px-4 py-24 sm:px-6 md:py-32" aria-labelledby="testi-judul">
+      <div class="mx-auto max-w-6xl">
+        <h2 id="testi-judul" class="reveal text-sm font-semibold text-mute" x-text="t('testimonials.title')"></h2>
+
+        <template x-if="testimonials().length === 0">
+          <div class="reveal mt-6 grid items-end gap-10 md:grid-cols-[1.4fr_1fr]">
+            <p class="font-display text-[clamp(2.6rem,7vw,5.5rem)] italic leading-[1.02]" x-text="t('testimonials.emptyTitle')"></p>
+            <div>
+              <p class="text-lg text-mute" x-text="t('testimonials.emptyBody')"></p>
+              <a href="#produk" class="btn btn-ghost mt-8 magnetic" x-text="t('testimonials.emptyCta')"></a>
+            </div>
+          </div>
+        </template>
+
+        <template x-if="testimonials().length > 0">
+          <div class="mt-8 grid gap-8 md:grid-cols-2">
+            <template x-for="(it, i) in testimonials()" :key="i">
+              <blockquote class="reveal rounded-3xl bg-white p-8">
+                <p class="font-display text-3xl italic leading-snug" x-text="quote(it)"></p>
+                <footer class="mt-6 text-sm text-mute"><b class="text-ink" x-text="it.name"></b><span x-text="' · ' + it.role"></span></footer>
+              </blockquote>
+            </template>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- KONTAK -->
+    <section id="kontak" class="dark-sec on-dark relative overflow-hidden px-4 py-24 sm:px-6 md:py-36">
+      <svg class="pointer-events-none absolute -bottom-52 -left-40 w-[760px] opacity-70" viewBox="0 0 800 800" aria-hidden="true">
+        <circle cx="400" cy="400" r="200" fill="none" stroke="#fff" stroke-opacity=".08"/>
+        <circle cx="400" cy="400" r="300" fill="none" stroke="#fff" stroke-opacity=".08"/>
+        <circle cx="400" cy="400" r="390" fill="none" stroke="#d4b06a" stroke-opacity=".35"/>
+      </svg>
+      <div class="relative mx-auto grid max-w-6xl gap-16 md:grid-cols-[1fr_1.1fr] md:gap-20">
+        <div class="reveal">
+          <h2 class="font-display text-5xl italic leading-[1.02] sm:text-7xl" x-text="t('contact.title')"></h2>
+          <p class="mt-6 max-w-md text-lg text-[#c9c9c4]" x-text="t('contact.intro')"></p>
+          <div class="mt-10 flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row">
+            <a :href="waHref()" target="_blank" rel="noopener" class="btn btn-light magnetic" x-text="t('contact.wa')"></a>
+            <a :href="mailHref()" class="btn btn-outline-light magnetic" x-text="t('contact.mail')"></a>
+          </div>
+          <p class="mt-6 text-sm text-[#a3a39e]"><span x-text="waLabel()"></span> · <span x-text="email()"></span></p>
+        </div>
+
+        <form class="reveal space-y-7" style="--d:120ms" novalidate @submit.prevent="send()" @focusin.once="formStart = Date.now()">
+          <div>
+            <label for="f-name" class="mb-1 block text-sm text-[#c9c9c4]" x-text="t('contact.form.name')"></label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="50" class="field" x-model="form.name" @blur="touch('name')" :class="errors.name && 'invalid'" :aria-invalid="errors.name ? 'true' : 'false'" aria-describedby="e-name">
+            <p id="e-name" class="field-error" role="alert" x-show="errors.name" x-cloak x-text="errors.name"></p>
+          </div>
+          <div>
+            <label for="f-email" class="mb-1 block text-sm text-[#c9c9c4]" x-text="t('contact.form.email')"></label>
+            <input id="f-email" name="email" type="email" inputmode="email" autocomplete="email" required maxlength="50" class="field" x-model="form.email" @blur="touch('email')" :class="errors.email && 'invalid'" :aria-invalid="errors.email ? 'true' : 'false'" aria-describedby="e-email">
+            <p id="e-email" class="field-error" role="alert" x-show="errors.email" x-cloak x-text="errors.email"></p>
+          </div>
+          <div>
+            <label for="f-topic" class="mb-1 block text-sm text-[#c9c9c4]" x-text="t('contact.form.topic')"></label>
+            <select id="f-topic" name="topic" class="field" x-model="form.topic">
+              <template x-for="k in ['consult','beta','resto','other']" :key="k">
+                <option :value="k" x-text="t('contact.form.topics.' + k)" :selected="form.topic === k"></option>
+              </template>
+            </select>
+          </div>
+          <div>
+            <label for="f-msg" class="mb-1 block text-sm text-[#c9c9c4]" x-text="t('contact.form.message')"></label>
+            <textarea id="f-msg" name="message" rows="4" required maxlength="500" class="field resize-none" x-model="form.message" @blur="touch('message')" :class="errors.message && 'invalid'" :aria-invalid="errors.message ? 'true' : 'false'" aria-describedby="e-msg c-msg"></textarea>
+            <div class="mt-1 flex items-start justify-between gap-4">
+              <p id="e-msg" class="field-error" role="alert" x-show="errors.message" x-cloak x-text="errors.message"></p>
+              <p id="c-msg" class="ml-auto shrink-0 text-xs" :class="msgLen() >= MIN_MSG ? 'text-gold' : 'text-[#a3a39e]'" x-text="msgLen() + ' / ' + MAX_MSG"></p>
+            </div>
+          </div>
+          <!-- honeypot anti-spam -->
+          <input type="checkbox" name="botcheck" class="hidden" tabindex="-1" autocomplete="off" x-model="form.botcheck" aria-hidden="true">
+
+          <!-- hCaptcha (widget dan skrip dari Web3Forms; paket gratis memakai site key bawaan mereka) -->
+          <div class="min-h-[78px]"><div class="h-captcha" data-captcha="true"></div></div>
+
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <button type="submit" class="btn btn-light magnetic disabled:opacity-60" :disabled="status === 'sending'" x-text="status === 'sending' ? t('contact.form.sending') : t('contact.form.send')"></button>
+            <p class="text-sm text-[#a3a39e]" x-text="t('contact.form.note')"></p>
+          </div>
+          <div aria-live="polite" class="min-h-[1.5rem] text-sm">
+            <p x-show="status === 'success'" x-cloak class="text-gold" x-text="t('contact.form.ok')"></p>
+            <p x-show="status === 'error'" x-cloak class="text-[#ffb4a8]" x-text="t('contact.form.fail')"></p>
+            <p x-show="status === 'spam'" x-cloak class="text-[#ffb4a8]" x-text="t('contact.form.spam')"></p>
+            <p x-show="status === 'wait'" x-cloak class="text-[#ffb4a8]" x-text="t('contact.form.wait')"></p>
+            <p x-show="status === 'captcha'" x-cloak class="text-[#ffb4a8]" x-text="t('contact.form.captcha')"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="dark-sec on-dark border-t border-white/15 px-4 py-10 sm:px-6">
+    <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+      <div>
+        <p class="font-bold">Sheven Studio</p>
+        <p class="mt-1 text-sm text-[#a3a39e]"><span x-text="t('footer.tagline')"></span></p>
+      </div>
+      <p class="text-sm text-[#a3a39e]">© 2026 Sheven Studio. <span x-text="t('footer.rights')"></span></p>
+      <a href="#beranda" class="flex min-h-[44px] items-center text-sm underline underline-offset-4" x-text="t('footer.top')"></a>
+    </div>
+  </footer>
+  <script src="https://web3forms.com/client/script.js" async defer></script>
+</body>
+</html>
