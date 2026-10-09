@@ -162,15 +162,10 @@ body { background: var(--paper); color: var(--ink); -webkit-font-smoothing: anti
 .field:focus { outline: none; border-bottom-color: var(--gold); box-shadow: 0 1px 0 0 var(--gold); }
 select.field option { color: #0a0a0a; }
 
-/* Gerakan dikurangi: semua statis */
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0ms !important; }
-  .reveal, .fade-in, .laptop-rise { opacity: 1; transform: none; }
-  .word > span { transform: none; }
-  .marquee { animation: none; flex-wrap: wrap; width: auto; }
-  .grain::after { display: none; }
-}
+/*
+  Sengaja TIDAK memakai prefers-reduced-motion: semua animasi selalu berjalan,
+  termasuk di perangkat yang menyalakan opsi "kurangi gerakan" (keputusan pemilik situs).
+*/
 
 /* Rel status produk */
 .rail-line { stroke: var(--ink); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 2s var(--ease) .5s; }
@@ -180,7 +175,6 @@ select.field option { color: #0a0a0a; }
 .rail-beta { background: #fff; border-color: var(--ink); box-shadow: inset 0 0 0 4px var(--gold); }
 .rail-soon { border-style: dashed; border-color: #77776f; }
 .rail-planned { border-color: #b9b9b2; }
-@media (prefers-reduced-motion: reduce) { .rail-line { stroke-dashoffset: 0; } }
 
 /* Replika layar masuk Gudangku (warna milik produk, bukan palet situs) */
 .gk { background: #151c26; }
@@ -225,7 +219,6 @@ select.field option { color: #0a0a0a; }
 .demo-pill:hover { border-color: var(--ink); }
 .demo-pill.on { background: var(--ink); color: #fff; border-color: var(--ink); }
 .demo-toggle { min-width: 44px; padding: 0; }
-@media (prefers-reduced-motion: reduce) { .demo-cursor { display: none; } .demo-screen { transform: none; } }
 
 /* Peta modul: satu aplikasi terpusat */
 .map-grid { border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
@@ -250,7 +243,6 @@ button:hover > .map-tile { transform: translateY(-4px); box-shadow: 0 16px 24px 
 .flow { stroke: var(--gold-ink); stroke-width: 2; stroke-dasharray: 6 12; animation: flow 1.4s linear infinite; }
 @keyframes flow { to { stroke-dashoffset: -18; } }
 .flow-plan { stroke: #c9c9c1; stroke-width: 1.5; stroke-dasharray: 3 7; }
-@media (prefers-reduced-motion: reduce) { .hub::after, .flow { animation: none; } }
 
 /* Validasi form */
 .field.invalid { border-bottom-color: #ffb4a8; }
