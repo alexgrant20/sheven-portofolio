@@ -3,24 +3,52 @@ name: Deploy to Rumahweb
 on:
   push:
     branches: [main]
+  # Jalankan manual dari tab Actions. Default dry-run: hanya menampilkan file yang akan diunggah.
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Uji coba tanpa mengunggah (hanya daftar file)"
+        type: boolean
+        default: true
+
+# Satu deploy pada satu waktu supaya dua push berdekatan tidak saling menimpa.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to public_html via FTP
+      - name: Deploy to public_html via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          # FTPS: login dan file dienkripsi. Jika gagal konek/TLS, ganti ke "ftp" lalu hubungi Rumahweb.
+          protocol: ftps
+          # loose: tetap terenkripsi, tapi tidak menolak sertifikat hosting bersama yang namanya berbeda dari domain.
+          security: loose
           local-dir: ./
-          server-dir: /
+          # Domain utama di cPanel = public_html. Sesuaikan jika akun FTP Anda sudah dibatasi ke folder itu.
+          server-dir: /public_html/
+          dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
           exclude: |
             **/.git*
             **/.git*/**
             **/.github/**
+            **/.claude/**
+            **/docs/**
+            **/node_modules/**
+            **/.DS_Store
+            **/Thumbs.db
+            **/*.log
             **/README.md

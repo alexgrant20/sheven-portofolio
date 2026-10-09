@@ -1,0 +1,13 @@
+# Sembunyikan file status sinkronisasi dari FTP-Deploy-Action agar tidak bisa dibuka publik.
+<Files ".ftp-deploy-sync-state.json">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</Files>
+
+DirectoryIndex index.html
+Options -Indexes

@@ -1,0 +1,16 @@
+# Sistem operasi dan editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+
+# Alat bantu
+.claude/
+node_modules/
+*.log
+
+# Rahasia dan berkas lokal
+.env
+.env.*
+*.local
