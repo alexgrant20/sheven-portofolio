@@ -218,13 +218,13 @@ window.SITE = {
         placeholder: 'Foto segera diganti',
         founders: [
           {
-            name: '[Nama Founder 1]',
-            role: 'Co-founder dan Lead Developer',
+            name: 'Sheila Gracia Angelina',
+            role: 'Founder',
             img: 'assets/img/founders/founder-1.png',
           },
           {
-            name: '[Nama Founder 2]',
-            role: 'Co-founder, Produk dan Desain',
+            name: 'Steven Alexander Grant',
+            role: 'Founder',
             img: 'assets/img/founders/founder-2.png',
           },
         ],
