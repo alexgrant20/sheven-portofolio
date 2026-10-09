@@ -1,7 +1,6 @@
 (function () {
   var SITE = window.SITE;
-  // Sengaja mengabaikan prefers-reduced-motion: animasi selalu berjalan (keputusan pemilik situs).
-  var reduce = false;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
