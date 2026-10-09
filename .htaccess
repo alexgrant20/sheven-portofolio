@@ -9,5 +9,7 @@
   </IfModule>
 </Files>
 
-DirectoryIndex index.html
-Options -Indexes
+# JANGAN menambahkan DirectoryIndex atau Options di sini.
+# File ini berada di web root, jadi berlaku juga untuk folder subdomain (resto, titipgracia,
+# warehouse-management, dst). Mengubah DirectoryIndex atau mematikan Indexes membuat aplikasi
+# PHP di subdomain itu menjawab 403 Forbidden.
