@@ -27,7 +27,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to public_html via FTPS
+      # Hosting mengirim Cache-Control 7 hari untuk CSS. Ganti penanda versi di index.html
+      # dengan SHA commit supaya setiap deploy memaksa browser mengambil CSS/JS terbaru.
+      - name: Cache-bust asset URLs
+        run: sed -i "s/__BUILD__/${GITHUB_SHA::7}/g" index.html
+
+      - name: Deploy via FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -38,8 +43,9 @@ jobs:
           # loose: tetap terenkripsi, tapi tidak menolak sertifikat hosting bersama yang namanya berbeda dari domain.
           security: loose
           local-dir: ./
-          # Domain utama di cPanel = public_html. Sesuaikan jika akun FTP Anda sudah dibatasi ke folder itu.
-          server-dir: /public_html/
+          # Akun FTP ini sudah berakar di web root domain utama (terbukti: file di "/" tampil di domain).
+          # Jangan pakai /public_html/ di sini: itu membuat folder bersarang yang tidak ditayangkan di akar situs.
+          server-dir: /
           dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
           exclude: |
             **/.git*
